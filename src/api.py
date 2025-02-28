@@ -41,7 +41,7 @@ async def users(rows:int, location:str='pt-BR'):
         response = await asyncio.to_thread(generate_user, rows, location)
 
         if response['status_code'] == 500:
-            raise HTTPException(status_code=500, detail=response.description)
+            raise HTTPException(status_code=500, detail=response['description'])
 
         return JSONResponse(response , status_code=200)
     except Exception as e:
