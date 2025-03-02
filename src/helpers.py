@@ -1,5 +1,6 @@
 from fastapi.exceptions import HTTPException
 from faker import Faker
+from .schemas import *
 
 class Generator:
     '''
@@ -19,9 +20,9 @@ class Generator:
         Método estático que retorna um generator de acordo com a sua localidade.
         Caso o generator não exista, o próprio método faz a instanciação e o armazena no atributo _instances.
         '''
-        if locale not in Generator._instances:
+        if locale not in Generator._instances.keys():
             Generator._instances[locale] = Faker(locale=locale)
-        return Generator._instances[locale]
+        return Generator._instances.get(locale, 'pt-BR')
 
     @staticmethod
     def generate_user(gender:str='any', safe:bool=True, locale:str='pt-BR'):
@@ -34,6 +35,8 @@ class Generator:
         - locale(str): define a localização de origem dos dados ('pt-BR', 'en-US', etc...)
         '''
         try:
+            gender = gender.lower()
+
             if gender not in ['f', 'm', 'any']:
                 raise KeyError("'gender' parameter should be 'm', 'f' or 'any'")
 
@@ -49,20 +52,20 @@ class Generator:
             last = fake.last_name()
             email = Generator._generate_email(first, last, safe, fake)
 
-            data = {
-                'id': fake.random_int(),
-                'first_name': first,
-                'last_name': last,
-                'email': email,
-                'phone_number': fake.phone_number(),
-                'address': {
-                    'number': fake.building_number(),
-                    'street_name': fake.street_name(),
-                    'city': fake.city(),
-                    'country': fake.country(),
-                    'postal_code': fake.postcode(),
-                }
-            }
+            data = UserSchema(
+                id = fake.random_int(),
+                first_name = first,
+                last_name = last,
+                email = email,
+                phone_number = fake.phone_number(),
+                address = AddressSchema(
+                    number = fake.building_number(),
+                    street_name = fake.street_name(),
+                    city = fake.city(),
+                    country = fake.country(),
+                    postal_code = fake.postcode()
+                )
+            )
 
             return data
         except KeyError as err:
@@ -82,6 +85,8 @@ class Generator:
         - locale(str): define a localização de origem dos dados ('pt-BR', 'en-US', etc...)
         '''
         try:
+            gender = gender.lower()
+
             if rows <= 0:
                 raise ValueError("'rows' parameter should not be less or equal than 0")
             if gender.lower() not in ['f', 'm', 'any']:

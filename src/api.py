@@ -1,6 +1,5 @@
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
-from fastapi.exceptions import HTTPException
 from .helpers import Generator
 import asyncio
 
