@@ -6,7 +6,7 @@ class AddressSchema(BaseModel):
     street_name: str
     city: str
     country: str
-    postal_code: int
+    postal_code: int | str
 
 class UserSchema(BaseModel):
     id: int
